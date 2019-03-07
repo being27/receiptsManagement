@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tt.oa.dao.ReceiptsDetailDao">
+    <insert id="addReceiptsDetails">
+      insert into oa.receipts_details(receipts_id, cost_type, money, detail) values
+      <foreach collection="receiptsDetails" item="receiptsDetail" separator=",">
+          (#{receiptsDetail.receiptsId}, #{receiptsDetail.costType}, #{receiptsDetail.money}, #{receiptsDetail.detail})
+      </foreach>
+    </insert>
+
+    <insert id="addReceiptsDetail">
+        insert into oa.receipts_details(receipts_id, cost_type, money, detail) values
+        (#{receiptsDetail.receiptsId}, #{receiptsDetail.costType}, #{receiptsDetail.money}, #{receiptsDetail.detail})
+    </insert>
+
+    <select id="listReceiptsDetailById" resultType="com.tt.oa.entity.ReceiptsDetails">
+        select * from oa.receipts_details where receipts_id = #{receiptsId}
+    </select>
+
+    <update id="updateReceiptsDetail" parameterType="com.tt.oa.entity.ReceiptsDetails">
+        update oa.receipts_details
+        <set>
+            <if test="receiptsId != null">receipts_id = #{receiptsId},</if>
+            <if test="costType != null">cost_type = #{costType},</if>
+            <if test="money != null">money = #{money},</if>
+            <if test="detail != null">detail = #{detail}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

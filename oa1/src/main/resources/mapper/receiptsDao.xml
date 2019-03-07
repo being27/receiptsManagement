@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tt.oa.dao.ReceiptsDao">
+    <resultMap id="receiptsMap" type="com.tt.oa.entity.Receipts">
+        <id property="id" column="id"/>
+        <result column="cause" property="cause"/>
+        <result property="createPersonId" column="create_person_id"/>
+        <result column="create_time" property="createTime"/>
+        <result property="pendingPersonId" column="pending_person_id"/>
+        <result column="total_money" property="totalMoney"/>
+        <result property="state" column="state"/>
+        <collection property="receiptsDetails" column="id"
+                    select="com.tt.oa.dao.ReceiptsDetailDao.listReceiptsDetailById"/>
+        <collection property="processingRecords" column="id"
+                    select="com.tt.oa.dao.ProcessingRecordsDao.listProcessingRecordsById"/>
+    </resultMap>
+
+    <select id="getReceiptsDetail" resultMap="receiptsMap">
+      select * from oa.receipts where id = #{id}
+    </select>
+
+    <select id="getMyReceipts" resultType="com.tt.oa.entity.Receipts">
+        select * from oa.receipts where create_person_id = #{createPersonId};
+    </select>
+
+    <select id="getMyPendingReceipts" resultType="com.tt.oa.entity.Receipts">
+        select * from oa.receipts where pending_person_id = #{pendingPersonId};
+    </select>
+
+    <insert id="addReceipts" parameterType="com.tt.oa.entity.Receipts" useGeneratedKeys="true" keyProperty="receipts.id">
+        insert into oa.receipts(cause, create_person_id, create_time, pending_person_id, total_money, state)
+        values (#{receipts.cause}, #{receipts.createPersonId}, #{receipts.createTime}, #{receipts.pendingPersonId}, #{receipts.totalMoney}, #{receipts.state})
+    </insert>
+
+    <update id="updateReceipts" parameterType="com.tt.oa.entity.Receipts">
+        update oa.receipts
+        <set>
+            <if test="cause != null">cause = #{cause},</if>
+            <if test="createPersonId != null">create_person_id = #{createPersonId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="pendingPersonId != null">pending_person_id = #{pendingPersonId},</if>
+            <if test="totalMoney != null">total_money = #{totalMoney},</if>
+            <if test="state != null">state = #{state}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

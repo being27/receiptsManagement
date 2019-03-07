@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tt.oa.dao.StaffDao">
+    <resultMap id="staffMap" type="com.tt.oa.entity.Staff">
+        <id column="id" property="id"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="duty" property="duty"/>
+        <association property="department" column="department_id"
+                     select="com.tt.oa.dao.DepartmentDao.getDepartment"/>
+    </resultMap>
+
+    <select id="getStaff" resultMap="staffMap">
+        select id, password, name, department_id, duty from oa.staff where id = #{id} and password = #{password}
+    </select>
+
+    <select id="getStaffById" resultType="com.tt.oa.entity.Staff">
+        select * from oa.staff where id = #{id};
+    </select>
+
+    <select id="listStaff" resultMap="staffMap">
+        select * from staff
+    </select>
+
+    <insert id="addStaff" parameterType="com.tt.oa.entity.Staff">
+        insert into oa.staff values (#{id}, #{password}, #{name}, #{department.id}, #{duty})
+    </insert>
+
+    <delete id="deleteStaff">
+        delete from oa.staff where id = #{id}
+    </delete>
+
+    <update id="updateStaff" parameterType="com.tt.oa.entity.Staff">
+        update oa.staff
+        <set>
+            <if test="password != null">password = #{password},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="duty != null">duty = #{duty},</if>
+            <if test="department != null">department_id = #{department.id}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

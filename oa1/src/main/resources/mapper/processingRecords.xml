@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tt.oa.dao.ProcessingRecordsDao">
+    <select id="listProcessingRecordsById" resultType="com.tt.oa.entity.ProcessingRecords">
+        select * from oa.processing_records where receipts_id = #{receiptsId}
+    </select>
+
+    <!--<insert id="addProcessingRecords" parameterType="com.tt.oa.entity.ProcessingRecords">-->
+        <!--insert into oa.processing_records (receipts_id, processing_person_id, processing_time, processing_type, processing_result, remarks) VALUES -->
+        <!--<foreach collection="processingRecords" item="processingRecord" separator=",">-->
+            <!--(#{processingRecord.receiptsId}, #{processingRecord.processingPersonId}, #{processingRecord.processingTime}, #{processingRecord.processringType}, #{processingRecord.processingResult}, #{processingRecord.remarks})-->
+        <!--</foreach>-->
+    <!--</insert>-->
+    <insert id="addProcessingRecords" parameterType="com.tt.oa.entity.ProcessingRecords">
+        insert into oa.processing_records (receipts_id, processing_person_id, processing_time, processing_type, processing_result, remarks) VALUES
+        (#{processingRecords.receiptsId}, #{processingRecords.processingPersonId}, #{processingRecords.processingTime}, #{processingRecords.processingType}, #{processingRecords.processingResult}, #{processingRecords.remarks})
+    </insert>
+
+    <!--<update id="updateProcessingRecords" parameterType="com.tt.oa.entity.ProcessingRecords">-->
+        <!--update oa.processing_records-->
+        <!--<set>-->
+            <!--<if test="receiptsId != null">receipts_id = #{receiptsId}</if>-->
+            <!--<if test="processingPersonId != null">processing_person_id = #{processingPersonId}</if>-->
+            <!--<if test="processingTime != null">processing_time = #{processingTime}</if>-->
+            <!--<if test="processingType != null">processing_type = #{processingType}</if>-->
+            <!--<if test="processingResult != null">processing_result = #{processingResult}</if>-->
+            <!--<if test="remarks != null">remarks = #{remarks}</if>-->
+        <!--</set>-->
+        <!---->
+    <!--</update>-->
+</mapper>

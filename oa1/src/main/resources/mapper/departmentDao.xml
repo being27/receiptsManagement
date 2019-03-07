@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tt.oa.dao.DepartmentDao">
+    <select id="getDepartment" resultType="com.tt.oa.entity.Department">
+        select * from department where oa.department.id = #{id};
+    </select>
+
+    <select id="listDepartment" resultType="com.tt.oa.entity.Department">
+        select * from department;
+    </select>
+
+    <delete id="deleteDepartment">
+        delete from oa.department where id = #{id}
+    </delete>
+
+    <update id="updateDepartment" parameterType="com.tt.oa.entity.Department">
+        update oa.department
+        <set>
+            <if test="departmentName != null">department_name = #{departmentName},</if>
+            <if test="departmentPosition != null">department_position = #{departmentPosition}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <insert id="addDepartment" parameterType="com.tt.oa.entity.Department">
+        insert into oa.department(id, department_name, department_position) values (#{id} , #{departmentName}, #{departmentPosition})
+    </insert>
+</mapper>
