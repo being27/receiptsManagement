@@ -35,8 +35,8 @@
                         </div>
                         <div class="section row">
                             <div class="col-md-6">
-                                <label for="department" class="field select">
-                                    <form:select path="department" items="${departmentList}" itemValue="id" itemLabel="departmentName" class="gui-input" placeholder="所属部门..."/>
+                                <label for="department.id" class="field select">
+                                    <form:select path="department.id" items="${departmentList}" itemValue="id" itemLabel="departmentName" class="gui-input" placeholder="所属部门..."/>
                                     <i class="arrow double"></i>
                                 </label>
                             </div>
