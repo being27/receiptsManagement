@@ -13,15 +13,15 @@
                     </div>
                     <div class="section row">
                         <div class="col-md-2">工号</div>
-                        <div class="col-md-4">${staff.id}</div>
+                        <div class="col-md-4">${sessionScope.staff.id}</div>
                         <div class="col-md-2">姓名</div>
-                        <div class="col-md-4">${staff.name}</div>
+                        <div class="col-md-4">${sessionScope.staff.name}</div>
                     </div>
                     <div class="section row">
                         <div class="col-md-2">所属部门</div>
-                        <div class="col-md-4">${staff.department.departmentName}</div>
+                        <div class="col-md-4">${sessionScope.staff.department.departmentName}</div>
                         <div class="col-md-2">职务</div>
-                        <div class="col-md-4">${staff.duty}</div>
+                        <div class="col-md-4">${sessionScope.staff.duty}</div>
                     </div>
                     <div class="panel-footer text-right">
                         <button type="button" class="button" onclick="javascript:window.history.go(-1);"> 返回 </button>

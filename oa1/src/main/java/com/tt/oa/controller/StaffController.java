@@ -1,6 +1,7 @@
 package com.tt.oa.controller;
 
 
+import com.tt.oa.dao.StaffDao;
 import com.tt.oa.entity.Department;
 import com.tt.oa.entity.Staff;
 import com.tt.oa.global.Content;
@@ -24,7 +25,8 @@ public class StaffController {
     private HttpServletRequest request;
     @Autowired
     private DepartmentService departmentService;
-
+    @Autowired
+    private StaffDao staffDao;
     @RequestMapping("/list")
     public ModelAndView toStaff(){
         ModelAndView modelAndView = new ModelAndView();
@@ -74,7 +76,7 @@ public class StaffController {
     public ModelAndView toUpdateStaff(String id, String password){
         ModelAndView modelAndView = new ModelAndView();
         List<Department> departmentList = departmentService.listDepartment();
-        Staff staff = staffService.getStaff(id, password);
+        Staff staff = staffDao.getStaffById(id);
         List<String> duties = Content.getPosts();
         modelAndView.addObject("departmentList", departmentList);
         modelAndView.addObject("staff", staff);

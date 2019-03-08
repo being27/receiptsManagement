@@ -20,27 +20,12 @@ public class LoginController {
     private HttpServletRequest request;
 
     @RequestMapping("/doLogin")
-    @ResponseBody
-    public ModelAndView doLogin(@Param("id")String id, @Param("password")String password){
-        ModelAndView modelAndView = new ModelAndView();
-        //输入为空
-        if ("".equals(id) || "".equals(password)){
-            modelAndView.addObject("success", false);
-            modelAndView.addObject("errMsg", "输入不能为空!");
-            modelAndView.setViewName("login");
-            return modelAndView;
-        }
-        Staff staff = staffService.getStaff(id, password);
-        //没有注册过该账号
+    public String doLogin(@Param("id")String id, @Param("password")String password){
+        Staff staff = staffService.login(id, password);
         if (staff == null){
-            modelAndView.addObject("success", false);
-            modelAndView.addObject("errMsg", "没有注册过该账号!");
-        }else {
-            request.getSession().setAttribute("staff", staff);
-            modelAndView.addObject("success", true);
-
-            modelAndView.setViewName("staff");
+            return "redirect:/init/toLoginPage";
         }
-        return modelAndView;
+        request.getSession().setAttribute("staff", staff);
+        return "staff";
     }
 }

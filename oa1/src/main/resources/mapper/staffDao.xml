@@ -12,10 +12,6 @@
                      select="com.tt.oa.dao.DepartmentDao.getDepartment"/>
     </resultMap>
 
-    <select id="getStaff" resultMap="staffMap">
-        select id, password, name, department_id, duty from oa.staff where id = #{id} and password = #{password}
-    </select>
-
     <select id="getStaffById" resultType="com.tt.oa.entity.Staff">
         select * from oa.staff where id = #{id};
     </select>

@@ -36,6 +36,8 @@ public class ReceiptsController {
     private HttpSession session;
     @Autowired
     private StaffService staffService;
+    @Autowired
+    private StaffDao staffDao;
     @RequestMapping("/to_add")
     public ModelAndView toAddReceipts(){
         ModelAndView modelAndView = new ModelAndView();
@@ -171,8 +173,8 @@ public class ReceiptsController {
         Receipts receipts = receiptsService.getReceiptsDetail(id);
 //        System.out.println(receipts);
         ModelAndView modelAndView = new ModelAndView();
-        Staff staff = staffService.getStaffById(receipts.getCreatePersonId());
-        Staff pendingPerson = staffService.getStaffById(receipts.getPendingPersonId());
+        Staff staff = staffDao.getStaffById(receipts.getCreatePersonId());
+        Staff pendingPerson = staffDao.getStaffById(receipts.getPendingPersonId());
         modelAndView.addObject("receipts", receipts);
         modelAndView.addObject("pendingPerson", pendingPerson);
         modelAndView.addObject("staff", staff);
@@ -187,7 +189,7 @@ public class ReceiptsController {
         System.out.println(processingRecords);
         Receipts receipts = receiptsService.getReceiptsDetail(processingRecords.getReceiptsId());
         Staff my = (Staff) session.getAttribute("staff");
-        Staff staff = staffService.getStaffById(processingRecords.getProcessingPersonId());
+        Staff staff = staffDao.getStaffById(processingRecords.getProcessingPersonId());
         if (Content.DEAL_SUBMIT.equals(processingRecords.getProcessingType()) && Content.POST_GM.equals(staff.getDuty())){    //以总经理的身份审核则直接通过
             processingRecords.setProcessingResult(Content.CLAIMVOUCHER_APPROVED);
             receipts.setState(Content.CLAIMVOUCHER_APPROVED);
