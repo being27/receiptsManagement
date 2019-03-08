@@ -12,6 +12,7 @@
         <div class="admin-form theme-primary mw1000 center-block" style="padding-bottom: 175px;">
             <div class="panel heading-border">
                 <form:form id="admin-form" name="addForm" action="/staff/update" method="post" modelAttribute="staff">
+                    <!-- 这边要把密码信息携带进来，不然到了绑定到后端时密码信息会丢失 -->
                     <form:hidden path="password"/>
                     <div class="panel-body bg-light">
                         <div class="section-divider mt20 mb40">
@@ -37,8 +38,8 @@
                         </div>
                         <div class="section row">
                             <div class="col-md-6">
-                                <label for="department" class="field select">
-                                    <form:select path="department" class="gui-input" placeholder="所属部门..." items="${departmentList}" itemValue="id" itemLabel="departmentName"/>
+                                <label for="department.id" class="field select">
+                                    <form:select path="department.id" class="gui-input" placeholder="所属部门..." items="${departmentList}" itemValue="id" itemLabel="departmentName"/>
                                     <i class="arrow double"></i>
                                 </label>
                             </div>
