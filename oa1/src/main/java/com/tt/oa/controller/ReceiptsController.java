@@ -20,14 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/receipts")
 public class ReceiptsController {
     @Autowired
     private HttpServletRequest request;
-    @Autowired
-    private ReceiptsDetailService receiptsDetailService;
     @Autowired
     private ReceiptsServiceImpl receiptsService;
     @Autowired
@@ -39,157 +38,98 @@ public class ReceiptsController {
     @Autowired
     private StaffDao staffDao;
     @RequestMapping("/to_add")
-    public ModelAndView toAddReceipts(){
-        ModelAndView modelAndView = new ModelAndView();
-        Receipts receipts = new Receipts();
+    public String toAddReceipts(Map<String, Object> map){
         //花销类型
-        List<String> typeList = Content.getItems();
-        modelAndView.addObject("typeList", typeList);
-        modelAndView.addObject("receipts", receipts);
-        modelAndView.setViewName("receiptsadd");
-        return modelAndView;
+        map.put("typeList", Content.getItems());
+        map.put("receipts", new Receipts());
+        return "receiptsadd";
     }
 
     @RequestMapping("/addreceipts")
     public String addReceipts(Receipts receipts){
+        //这个Receipts的Id是添加到数据库之后才得到的
         receiptsService.addReceipts(receipts);
-        List<ReceiptsDetails> receiptsDetails = receipts.getReceiptsDetails();
-        for (ReceiptsDetails receiptsDetail : receiptsDetails){
-            receiptsDetail.setReceiptsId(receipts.getId());
-        }
-        ProcessingRecords processingRecords = createProcessingRecords(request.getSession(), receipts);
-        processingRecords.setProcessingType(Content.DEAL_CREATE);
-        processingRecords.setProcessingResult(Content.CLAIMVOUCHER_CREATED);
-        receiptsDetailService.addReceiptsDetails(receiptsDetails);
-        processingRecordsService.addProcessingRecords(processingRecords);
-//        List<ReceiptsDetails> receiptsDetailsList = request.getParameter();
-//        System.out.println(totalMoney);
         return "redirect:to_selfreceipts?id=" + receipts.getCreatePersonId();
     }
 
-    private ProcessingRecords createProcessingRecords(HttpSession session, Receipts receipts){
-        ProcessingRecords processingRecords = new ProcessingRecords();
-        processingRecords.setReceiptsId(receipts.getId());
-        Staff staff = (Staff) request.getSession().getAttribute("staff");
-        processingRecords.setProcessingPersonId(staff.getId());
-        processingRecords.setProcessingTime(new Date());
-        return processingRecords;
-    }
-
     @RequestMapping("/to_selfreceipts")
-    public ModelAndView toSelfReceipts(@Param("id")String id){
-        ModelAndView modelAndView = new ModelAndView();
-        List<Receipts> receipts = receiptsService.getMyReceipts(id);
-        modelAndView.addObject("myReceipts", receipts);
-        modelAndView.setViewName("selfreceipts");
-        return modelAndView;
+    public String toSelfReceipts(@Param("id")String id, Map<String, Object> map){
+        map.put("myReceipts", receiptsService.getMyReceipts(id));
+        return "selfreceipts";
     }
 
     @RequestMapping("/detail")
-    public ModelAndView detailReceipts(@Param("receiptsId")Integer receiptsId){
-        ModelAndView modelAndView = new ModelAndView();
-        Receipts receipts = receiptsService.getReceiptsDetail(receiptsId);
-        modelAndView.addObject("receipts", receipts);
-        modelAndView.setViewName("receiptsdetail");
-        return modelAndView;
+    public String detailReceipts(@Param("receiptsId")Integer receiptsId, Map<String, Object> map){
+        map.put("receipts", receiptsService.getReceiptsDetail(receiptsId));
+        return "receiptsdetail";
     }
 
     @RequestMapping("/deal")
-    public ModelAndView dealReceipts(@Param("id")String id){
-        ModelAndView modelAndView = new ModelAndView();
-        List<Receipts> toDealReceipts = receiptsService.getMyPendingReceipts(id);
-        modelAndView.addObject("toDealReceipts", toDealReceipts);
-        modelAndView.setViewName("receiptstodeal");
-        return modelAndView;
+    public String dealReceipts(@Param("id")String id, Map<String, Object> map){
+        map.put("toDealReceipts", receiptsService.getMyPendingReceipts(id));
+        return "receiptstodeal";
     }
 
     @RequestMapping("/to_update")
-    public ModelAndView toUpdateReceipts(@Param("id")Integer id){
-        ModelAndView modelAndView = new ModelAndView();
-        Receipts receipts = receiptsService.getReceiptsDetail(id);
-        List<String> costTypes = Content.getItems();
-//        System.out.println(receipts);
-        modelAndView.addObject("receipts", receipts);
-        modelAndView.addObject("costTypes", costTypes);
-        modelAndView.setViewName("receiptsupdate");
-        return modelAndView;
+    public String toUpdateReceipts(@Param("id")Integer id, Map<String, Object> map){
+        map.put("receipts", receiptsService.getReceiptsDetail(id));
+        map.put("costTypes", Content.getItems());
+        return "receiptsupdate";
     }
 
     @RequestMapping("/update")
     public String updateReceipts(Receipts receipts){
-        //逻辑：修改detail表，并且添加一条该报销单的处理流程
-        System.out.println(receipts);
-        ProcessingRecords processingRecords = createProcessingRecords(request.getSession(), receipts);
-        processingRecords.setProcessingType(Content.DEAL_UPDATE);
-        processingRecords.setProcessingResult(Content.CLAIMVOUCHER_CREATED);
         receiptsService.updateReceipts(receipts);
-        processingRecordsService.addProcessingRecords(processingRecords);
         Staff staff = (Staff) session.getAttribute("staff");
         return "redirect:deal?id=" + staff.getId();
     }
 
     @RequestMapping("/submit")
     public String submitReceipts(@Param("id")Integer id){
-        //有两个逻辑：部门经理提交小于5000，直接变为已审核状态，总经理提交直接变为已审核状态
         Receipts receipts = receiptsService.getReceiptsDetail(id);
+        ProcessingRecords processingRecords = null;
         if ("10001".equals(receipts.getCreatePersonId())){
             receipts.setState(Content.CLAIMVOUCHER_APPROVED);
             receipts.setPendingPersonId("10002");
-            addProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_APPROVED);
+            processingRecords = createProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_APPROVED);
         }else if("10003".equals(receipts.getCreatePersonId()) && receipts.getTotalMoney() <= 5000){
             receipts.setState(Content.CLAIMVOUCHER_APPROVED);
             receipts.setPendingPersonId("10002");
-            addProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_APPROVED);
+            processingRecords = createProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_APPROVED);
         }else if ("10003".equals(receipts.getCreatePersonId()) && receipts.getTotalMoney() > 5000){
             receipts.setState(Content.CLAIMVOUCHER_RECHECK);
             receipts.setPendingPersonId("10001");
-            addProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_RECHECK);
+            processingRecords = createProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_RECHECK);
         }else {
             receipts.setPendingPersonId("10003");
             receipts.setState(Content.CLAIMVOUCHER_SUBMIT);
-            addProcessingRecords(receipts, Content.DEAL_SUBMIT, Content.CLAIMVOUCHER_SUBMIT);
+            processingRecords = createProcessingRecords(receipts, Content.DEAL_SUBMIT, Content.CLAIMVOUCHER_SUBMIT);
         }
-
-        receiptsService.updateReceiptsOnly(receipts);
+        receiptsService.updateReceiptsOnly(receiptsService.getReceiptsDetail(id), processingRecords);
         Staff staff = (Staff) session.getAttribute("staff");
-        //添加处理记录
-//        addProcessingRecords(receipts, Content.DEAL_SUBMIT, Content.CLAIMVOUCHER_SUBMIT);
-//        ProcessingRecords processingRecords = createProcessingRecords(request.getSession(), receipts);
-//        processingRecords.setProcessingType(Content.DEAL_SUBMIT);
-//        processingRecords.setProcessingResult(Content.CLAIMVOUCHER_SUBMIT);
         return "redirect:deal?id=" + staff.getId();
     }
 
-    private void addProcessingRecords(Receipts receipts, String type, String result){
-        ProcessingRecords processingRecords = createProcessingRecords(request.getSession(), receipts);
-        processingRecords.setProcessingType(type);
-        processingRecords.setProcessingResult(result);
-        processingRecordsService.addProcessingRecords(processingRecords);
-    }
-
     @RequestMapping("/tocheck")
-    public ModelAndView toCheckReceipts(@Param("id")Integer id){
-        //一个新的处理记录
+    public String toCheckReceipts(@Param("id")Integer id, Map<String, Object> map){
         Receipts receipts = receiptsService.getReceiptsDetail(id);
-//        System.out.println(receipts);
-        ModelAndView modelAndView = new ModelAndView();
-        Staff staff = staffDao.getStaffById(receipts.getCreatePersonId());
+        Staff createStaff = staffDao.getStaffById(receipts.getCreatePersonId());
         Staff pendingPerson = staffDao.getStaffById(receipts.getPendingPersonId());
-        modelAndView.addObject("receipts", receipts);
-        modelAndView.addObject("pendingPerson", pendingPerson);
-        modelAndView.addObject("staff", staff);
-        ProcessingRecords processingRecords = createProcessingRecords(session, receipts);   //还差三个属性
-        modelAndView.addObject("processingRecords", processingRecords);
-        modelAndView.setViewName("receiptscheck");
-        return modelAndView;
+        map.put("receipts", receipts);
+        map.put("pendingPerson", pendingPerson);
+        map.put("createStaff", createStaff);
+        ProcessingRecords processingRecords = new ProcessingRecords();
+        processingRecords.setReceiptsId(receipts.getId());
+        map.put("processingRecords", processingRecords);
+        return "receiptscheck";
     }
 
     @RequestMapping("/check")
-    public String checkReceipts(ProcessingRecords processingRecords){
-        System.out.println(processingRecords);
+    public String checkReceipts(ProcessingRecords processingRecords){   //包装了receipts.id 和 remarks、processingType
         Receipts receipts = receiptsService.getReceiptsDetail(processingRecords.getReceiptsId());
         Staff my = (Staff) session.getAttribute("staff");
         Staff staff = staffDao.getStaffById(processingRecords.getProcessingPersonId());
+        processingRecords.setProcessingTime(new Date());
         if (Content.DEAL_SUBMIT.equals(processingRecords.getProcessingType()) && Content.POST_GM.equals(staff.getDuty())){    //以总经理的身份审核则直接通过
             processingRecords.setProcessingResult(Content.CLAIMVOUCHER_APPROVED);
             receipts.setState(Content.CLAIMVOUCHER_APPROVED);
@@ -215,10 +155,18 @@ public class ReceiptsController {
             receipts.setState(Content.CLAIMVOUCHER_APPROVED);
             receipts.setPendingPersonId("10002");
         }
-        processingRecordsService.addProcessingRecords(processingRecords);
-        receiptsService.updateReceiptsOnly(receipts);
-        System.out.println(receipts);
-        System.out.println(processingRecords);
+        receiptsService.updateReceiptsOnly(receipts, processingRecords);
         return "redirect:deal?id=" + my.getId();
+    }
+
+    public ProcessingRecords createProcessingRecords(Receipts receipts, String processingType, String processingResult){
+        ProcessingRecords processingRecords = new ProcessingRecords();
+        processingRecords.setReceiptsId(receipts.getId());
+        Staff staff = (Staff) request.getSession().getAttribute("staff");
+        processingRecords.setProcessingPersonId(staff.getId());
+        processingRecords.setProcessingTime(new Date());
+        processingRecords.setProcessingType(processingType);
+        processingRecords.setProcessingResult(processingResult);
+        return processingRecords;
     }
 }

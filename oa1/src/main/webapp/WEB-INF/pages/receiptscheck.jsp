@@ -21,7 +21,7 @@
                     </div>
                     <div class="section row">
                         <div class="col-md-2">创建人</div>
-                        <div class="col-md-4">${staff.name}</div>
+                        <div class="col-md-4">${createStaff.name}</div>
                         <div class="col-md-2">创建时间</div>
                         <fmt:formatDate value="${receipts.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </div>
@@ -64,8 +64,6 @@
                     <form:form id="admin-form" name="addForm" modelAttribute="processingRecords" action="/receipts/check" method="post">
                         <div class="panel-body bg-light">
                             <form:hidden path="receiptsId"/>
-                            <form:hidden path="processingPersonId"/>
-                            <form:hidden path="processingTime"/>
                             <div class="section">
                                 <label for="remarks" class="field prepend-icon">
                                     <input id="remarks" name="remarks" class="gui-input" placeholder="备注..." type="text" value=""/>
