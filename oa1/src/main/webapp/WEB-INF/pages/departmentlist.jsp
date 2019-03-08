@@ -63,7 +63,7 @@
                             <td>${department.departmentPosition}</td>
                             <td>
                                 <a href="/department/to_update?id=${department.id}">编辑</a>
-                                <a href="/department/delete?id=${department.id}">删除</a>
+                                <a href="/department/remove?id=${department.id}">删除</a>
                             </td>
                         </tr>
                         </c:forEach>
