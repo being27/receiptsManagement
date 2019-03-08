@@ -1,8 +1,5 @@
 package com.tt.oa.controller;
 
-
-import com.tt.oa.dao.StaffDao;
-import com.tt.oa.entity.Department;
 import com.tt.oa.entity.Staff;
 import com.tt.oa.global.Content;
 import com.tt.oa.service.DepartmentService;
@@ -11,10 +8,9 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/staff")
@@ -25,43 +21,27 @@ public class StaffController {
     private HttpServletRequest request;
     @Autowired
     private DepartmentService departmentService;
-    @Autowired
-    private StaffDao staffDao;
-    @RequestMapping("/list")
-    public ModelAndView toStaff(){
-        ModelAndView modelAndView = new ModelAndView();
-        List<Staff> staffList = staffService.listStaff();
-        modelAndView.addObject("staffList", staffList);
-        modelAndView.setViewName("employeelist");
 
-        return modelAndView;
+    @RequestMapping("/list")
+    public String toStaff(Map<String, Object> map){
+        map.put("staffList", staffService.listStaff());
+        return "employeelist";
     }
 
     @RequestMapping("/to_add")
-    public ModelAndView toAddStaff(){
-        //不需要携带当前员工的信息
-//        Staff staff = (Staff) request.getSession().getAttribute("staff");
-        Staff staff = new Staff();
-        List<String> duties = Content.getPosts();
-        List<Department> departmentList = departmentService.listDepartment();
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("duties", duties);
-        modelAndView.addObject("staff", staff);
-        modelAndView.addObject("departmentList", departmentList);
-        modelAndView.setViewName("employeeadd");
-        return modelAndView;
+    /**
+     * 由于前端有select标签，因此需要传递集合类型的已添加的部门和员工职责集合
+     */
+    public String toAddStaff(Map<String, Object> map){
+        map.put("departmentList", departmentService.listDepartment());
+        map.put("duties", Content.getPosts());
+        map.put("staff", new Staff());
+        return "employeeadd";
     }
 
     @RequestMapping("/addStaff")
     //通过bean的方式接收form表单参数
-    public String addStaff(@Param("name")String name, @Param("duty")String duty){
-        Staff staff = new Staff(name, duty);
-        String departmentId = request.getParameter("department");
-        String staffId = request.getParameter("id");
-        Department department = new Department();
-        department.setId(departmentId);
-        staff.setId(staffId);
-        staff.setDepartment(department);
+    public String addStaff(Staff staff){
         staffService.addStaff(staff);
         return "redirect:list";
     }
@@ -73,28 +53,15 @@ public class StaffController {
     }
 
     @RequestMapping("/toupdate")
-    public ModelAndView toUpdateStaff(String id, String password){
-        ModelAndView modelAndView = new ModelAndView();
-        List<Department> departmentList = departmentService.listDepartment();
-        Staff staff = staffDao.getStaffById(id);
-        List<String> duties = Content.getPosts();
-        modelAndView.addObject("departmentList", departmentList);
-        modelAndView.addObject("staff", staff);
-        modelAndView.addObject("duties", duties);
-        modelAndView.setViewName("employeeupdate");
-        return modelAndView;
+    public String toUpdateStaff(@Param("id")String id, Map<String, Object> map){
+        map.put("departmentList", departmentService.listDepartment());
+        map.put("staff", staffService.getStaffById(id));
+        map.put("duties", Content.getPosts());
+        return "employeeupdate";
     }
 
     @RequestMapping("/update")
-    public String updateStuff(@Param("name")String name, @Param("duty")String duty, @Param("password")String password){
-        String departmentId = request.getParameter("department");
-        String id = request.getParameter("id");
-        Department department = new Department();
-        department.setId(departmentId);
-        Staff staff = new Staff(password, name, duty);
-        staff.setId(id);
-        staff.setDepartment(department);
-        System.out.println(staff);
+    public String updateStuff(Staff staff){
         staffService.updateStaff(staff);
         return "redirect:list";
     }

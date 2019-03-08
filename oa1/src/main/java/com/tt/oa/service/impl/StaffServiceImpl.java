@@ -3,6 +3,7 @@ package com.tt.oa.service.impl;
 import com.tt.oa.service.StaffService;
 import com.tt.oa.dao.StaffDao;
 import com.tt.oa.entity.Staff;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,10 @@ public class StaffServiceImpl implements StaffService {
         if (password.equals(staff.getPassword()))
             return staff;
         return null;
+    }
+
+    public Staff getStaffById(String id){
+        return  staffDao.getStaffById(id);
     }
 
     public List<Staff> listStaff() {
