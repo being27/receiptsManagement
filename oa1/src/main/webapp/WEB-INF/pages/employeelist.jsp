@@ -68,7 +68,7 @@
                                     <span class="badge badge-warning mr10 fs11"> ${staff.duty}</span>
                                 </td>
                                 <td>
-                                    <a href="/staff/toupdate?id=${staff.id}&password=${staff.password}">编辑</a>
+                                    <a href="/staff/toupdate?id=${staff.id}">编辑</a>
                                     <a href="/staff/delete?id=${staff.id}">删除</a>
                                 </td>
                             </tr>
