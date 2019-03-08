@@ -13,12 +13,17 @@ public class StaffServiceImpl implements StaffService {
     @Autowired
     private StaffDao staffDao;
 
-    public Staff getStaff(String id, String password) {
-        return staffDao.getStaff(id, password);
-    }
-
-    public Staff getStaffById(String id) {
-        return staffDao.getStaffById(id);
+    /**
+     * 对登录进行判断，如果返回值不为null则说明用户存在
+     * @param id
+     * @param password
+     * @return
+     */
+    public Staff login(String id, String password) {
+        Staff staff = staffDao.getStaffById(id);
+        if (password.equals(staff.getPassword()))
+            return staff;
+        return null;
     }
 
     public List<Staff> listStaff() {

@@ -6,8 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface StaffService {
-    Staff getStaff(String id, String password);
-    Staff getStaffById(String id);
+    //懒惰的原因，不考虑业务层的逻辑而制定对应的方法，只是复制Dao层的方法
+    Staff login(String id, String password);
     List<Staff> listStaff();
     void addStaff(Staff staff);
     void deleteStaff(String id);
