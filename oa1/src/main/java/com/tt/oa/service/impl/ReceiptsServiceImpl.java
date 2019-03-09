@@ -92,7 +92,52 @@ public class ReceiptsServiceImpl implements ReceiptsService {
 
     public void updateReceiptsOnly(Receipts receipts, ProcessingRecords processingRecords){
         //有两个逻辑：部门经理提交小于5000，直接变为已审核状态，总经理提交直接变为已审核状态
-
+        if (request.getServletPath().substring(10).equals("submit")){
+            if ("10001".equals(receipts.getCreatePersonId())){
+                receipts.setState(Content.CLAIMVOUCHER_APPROVED);
+                receipts.setPendingPersonId("10002");
+                processingRecords = createProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_APPROVED);
+            }else if("10003".equals(receipts.getCreatePersonId()) && receipts.getTotalMoney() <= 5000){
+                receipts.setState(Content.CLAIMVOUCHER_APPROVED);
+                receipts.setPendingPersonId("10002");
+                processingRecords = createProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_APPROVED);
+            }else if ("10003".equals(receipts.getCreatePersonId()) && receipts.getTotalMoney() > 5000){
+                receipts.setState(Content.CLAIMVOUCHER_RECHECK);
+                receipts.setPendingPersonId("10001");
+                processingRecords = createProcessingRecords(receipts, Content.DEAL_CHECK, Content.CLAIMVOUCHER_RECHECK);
+            }else {
+                receipts.setPendingPersonId("10003");
+                receipts.setState(Content.CLAIMVOUCHER_SUBMIT);
+                processingRecords = createProcessingRecords(receipts, Content.DEAL_SUBMIT, Content.CLAIMVOUCHER_SUBMIT);
+            }
+        }else{
+            Staff my = (Staff) session.getAttribute("staff");
+            if (Content.DEAL_SUBMIT.equals(processingRecords.getProcessingType()) && Content.POST_GM.equals(my.getDuty())){    //以总经理的身份审核则直接通过
+                processingRecords = createProcessingRecords(receipts, processingRecords.getProcessingType(), Content.CLAIMVOUCHER_APPROVED);
+                receipts.setState(Content.CLAIMVOUCHER_APPROVED);
+                receipts.setPendingPersonId("10002");
+            }else if (Content.DEAL_BACK.equals(processingRecords.getProcessingType())){ //不论是谁打回都直接设置打回状态，并且下一个处理人变为创建者
+                processingRecords = createProcessingRecords(receipts, processingRecords.getProcessingType(), Content.CLAIMVOUCHER_BACK);
+                receipts.setState(Content.CLAIMVOUCHER_BACK);
+                receipts.setPendingPersonId(receipts.getCreatePersonId());
+            }else if (Content.DEAL_REJECT.equals(processingRecords.getProcessingType())){   //如果是拒绝，也统一排个报销单创建者
+                processingRecords = createProcessingRecords(receipts, processingRecords.getProcessingType(), Content.CLAIMVOUCHER_TERMINATED);
+                receipts.setPendingPersonId(receipts.getCreatePersonId());
+                receipts.setState(Content.CLAIMVOUCHER_TERMINATED);
+            }else if (!Content.POST_GM.equals(my.getDuty()) && Content.DEAL_PASS.equals(processingRecords.getProcessingType()) && receipts.getTotalMoney() > Content.LIMIT_CHECK){
+                processingRecords = createProcessingRecords(receipts, processingRecords.getProcessingType(), Content.CLAIMVOUCHER_RECHECK);
+                receipts.setState(Content.CLAIMVOUCHER_RECHECK);
+                receipts.setPendingPersonId("10001");
+            }else if (Content.DEAL_PAID.equals(processingRecords.getProcessingType())){ //财务打款
+                processingRecords = createProcessingRecords(receipts, processingRecords.getProcessingType(), Content.CLAIMVOUCHER_PAID);
+                receipts.setPendingPersonId(receipts.getCreatePersonId());
+                receipts.setState(Content.CLAIMVOUCHER_PAID);
+            }else {
+                processingRecords = createProcessingRecords(receipts, processingRecords.getProcessingType(), Content.CLAIMVOUCHER_APPROVED);
+                receipts.setState(Content.CLAIMVOUCHER_APPROVED);
+                receipts.setPendingPersonId("10002");
+            }
+        }
         receiptsDao.updateReceipts(receipts);
         processingRecordsService.addProcessingRecords(processingRecords);
     }
@@ -103,7 +148,9 @@ public class ReceiptsServiceImpl implements ReceiptsService {
         Staff staff = (Staff) request.getSession().getAttribute("staff");
         processingRecords.setProcessingPersonId(staff.getId());
         processingRecords.setProcessingTime(new Date());
-        processingRecords.setProcessingType(processingType);
+        if (processingType != null){
+            processingRecords.setProcessingType(processingType);
+        }
         processingRecords.setProcessingResult(processingResult);
         return processingRecords;
     }
