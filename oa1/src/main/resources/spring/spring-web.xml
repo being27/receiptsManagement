@@ -13,13 +13,14 @@
     <!--<mvc:resources mapping="*/resources/img/*" location="/resources/"/>-->
     <mvc:default-servlet-handler/>
 
-    <!--<mvc:interceptors>-->
-        <!--<mvc:interceptor>-->
-            <!--<mvc:mapping path="/category/**"/>-->
-            <!--<mvc:mapping path="/dept/**"/>-->
-            <!--<bean class="com.tt.interceptor.LoginInterceptor"/>-->
-        <!--</mvc:interceptor>-->
-    <!--</mvc:interceptors>-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/department/**"/>
+            <mvc:mapping path="/receipts/**"/>
+            <mvc:mapping path="/staff/**"/>
+            <bean class="com.tt.oa.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
     <mvc:annotation-driven conversion-service="conversionService"/>
     <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">

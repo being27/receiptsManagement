@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping("/staff")
+@RequestMapping("/login")
 public class LoginController {
     @Autowired
     private StaffService staffService;

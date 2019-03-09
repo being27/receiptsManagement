@@ -22,7 +22,7 @@
                     <p class="lead">欢迎使用爱慕课自动化管理系统</p>
                 </div>
                 <div class="panel mt30 mb25">
-                    <form method="post" action="/staff/doLogin" id="contact">
+                    <form method="post" action="/login/doLogin" id="contact">
                         <div class="panel-body bg-light p25 pb15">
                             <div class="section">
                                 <label for="id" class="field-label text-muted fs18 mb10">工号</label>
