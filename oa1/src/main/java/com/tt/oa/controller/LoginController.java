@@ -21,8 +21,10 @@ public class LoginController {
 
     @RequestMapping("/doLogin")
     public String doLogin(@Param("id")String id, @Param("password")String password){
-        Staff staff = staffService.login(id, password);
+        Staff staff = staffService.getStaffById(id);
         if (staff == null){
+            return "redirect:/init/toLoginPage";
+        }else if (!password.equals(staff.getPassword())){
             return "redirect:/init/toLoginPage";
         }
         request.getSession().setAttribute("staff", staff);

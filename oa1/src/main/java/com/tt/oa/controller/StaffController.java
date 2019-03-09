@@ -22,6 +22,29 @@ public class StaffController {
     @Autowired
     private DepartmentService departmentService;
 
+    @RequestMapping("/toSelf")
+    public String toSelf(Map<String, Object> map, @Param("id")String id){
+        map.put("staff", staffService.getStaffById(id));
+        return "staff";
+    }
+
+    @RequestMapping("/tochangepassword")
+    public String toChangePassword(Map<String, Object> map, @Param("id")String id){
+        map.put("staff", staffService.getStaffById(id));
+        return "changepassword";
+    }
+
+    @RequestMapping("/changePassword")
+    public String changePassword(@Param("new1")String new1, @Param("new2")String new2){
+        Staff staff = (Staff) request.getSession().getAttribute("staff");
+        if (new1.equals(new2)){
+            staff.setPassword(new1);
+            staffService.updateStaff(staff);
+            return "redirect:toSelf";
+        }
+        return "redirect:tochangepassword";
+    }
+
     @RequestMapping("/list")
     public String toStaff(Map<String, Object> map){
         map.put("staffList", staffService.listStaff());
