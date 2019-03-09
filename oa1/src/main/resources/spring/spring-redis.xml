@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:redis.properties"/>
+    <!-- Redis连接池的设置 -->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!-- 最大空闲数 -->
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <!-- 最大连接数 -->
+        <property name="maxTotal" value="${redis.pool.maxTotal}"/>
+        <!-- 最大等待时间 -->
+        <property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}"/>
+        <!-- 在获取连接时是否检查有效性 -->
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+    </bean>
+
+    <!-- 创建redis连接池，以构造方法的方式传递参数，第一个参数是PoolConfig对象，第二个是主机名，第三个是端口名 -->
+    <bean id="jedisPoolWriper" class="com.tt.oa.cache.JedisPoolWriper">
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <constructor-arg index="1" value="${redis.hostname}"/>
+        <constructor-arg index="2" value="${redis.port}"/>
+    </bean>
+
+    <!-- 创建Redis工具类 -->
+    <bean id="jedisUtil" class="com.tt.oa.cache.JedisUtil" scope="singleton">
+        <property name="jedisPool" ref="jedisPoolWriper"/>
+    </bean>
+
+    <!-- Redis的key操作 -->
+    <bean id="jedisKeys" class="com.tt.oa.cache.JedisUtil$Keys" scope="singleton">
+        <!--<constructor-arg ref="jedisUtil"/>-->
+    </bean>
+
+    <bean id="jedisStrings" class="com.tt.oa.cache.JedisUtil$Keys" scope="singleton"/>
+    <bean id="jedisLists" class="com.tt.oa.cache.JedisUtil$Strings" scope="singleton"/>
+    <bean id="jedisSets" class="com.tt.oa.cache.JedisUtil$Sets" scope="singleton"/>
+    <bean id="jedisHash" class="com.tt.oa.cache.JedisUtil$Hash" scope="singleton"/>
+</beans>
