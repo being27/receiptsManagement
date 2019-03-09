@@ -12,6 +12,8 @@ import com.tt.oa.service.ReceiptsDetailService;
 import com.tt.oa.service.ReceiptsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -33,6 +35,7 @@ public class ReceiptsServiceImpl implements ReceiptsService {
     @Autowired
     private HttpSession session;
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void addReceipts(Receipts receipts) {
         //设置创建状态
         receipts.setCreateTime(new Date());
@@ -69,6 +72,7 @@ public class ReceiptsServiceImpl implements ReceiptsService {
         return receiptsDao.getReceiptsDetail(id);
     }
 
+    @Transactional
     public void updateReceipts(Receipts receipts) {
         /**
          * 要进行一次判定，如果receiptsDetail的id为null则执行插入操作，不为空则修改操作
@@ -90,6 +94,7 @@ public class ReceiptsServiceImpl implements ReceiptsService {
         processingRecordsService.addProcessingRecords(processingRecords);
     }
 
+    @Transactional
     public void updateReceiptsOnly(Receipts receipts, ProcessingRecords processingRecords){
         //有两个逻辑：部门经理提交小于5000，直接变为已审核状态，总经理提交直接变为已审核状态
         if (request.getServletPath().substring(10).equals("submit")){
