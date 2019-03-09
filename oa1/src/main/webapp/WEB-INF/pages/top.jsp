@@ -33,17 +33,17 @@
                 </a>
                 <ul class="dropdown-menu list-group dropdown-persist w250" role="menu">
                     <li class="list-group-item">
-                        <a href="/self" class="animated animated-short fadeInUp">
+                        <a href="/staff/toSelf?id=${staff.id}" class="animated animated-short fadeInUp">
                             <span class="fa fa-user"></span> 个人信息
                             <span class="label label-warning"></span>
                         </a>
                     </li>
                     <li class="list-group-item">
-                        <a href="/to_change_password" class="animated animated-short fadeInUp">
+                        <a href="/staff/tochangepassword?id=${staff.id}" class="animated animated-short fadeInUp">
                             <span class="fa fa-gear"></span> 设置密码 </a>
                     </li>
                     <li class="dropdown-footer">
-                        <a href="/quit" class="">
+                        <a href="/init/toLoginPage" class="">
                             <span class="fa fa-power-off pr5"></span> 退出 </a>
                     </li>
                 </ul>
