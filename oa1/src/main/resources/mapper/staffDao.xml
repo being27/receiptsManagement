@@ -12,7 +12,7 @@
                      select="com.tt.oa.dao.DepartmentDao.getDepartment"/>
     </resultMap>
 
-    <select id="getStaffById" resultType="com.tt.oa.entity.Staff">
+    <select id="getStaffById" resultMap="staffMap">
         select * from oa.staff where id = #{id};
     </select>
 
