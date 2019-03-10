@@ -49,7 +49,6 @@ public class DepartmentController {
      * 对部门进行修改，前端输入的信息会自动的绑定到参数对象中去
      */
     public String updateDepartment(Department department){
-        String id = request.getParameter("id");
         departmentService.updateDepartment(department);
         return "redirect:list";
     }

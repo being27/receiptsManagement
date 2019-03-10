@@ -27,8 +27,23 @@ public class DepartmentServiceImpl implements DepartmentService {
     //定义部门信息的key
     private static String DEPARTMENTKEY = "departmentList";
 
+    //通过部门id查找部门这个操作还是挺多的，因此使用 DEPARTMENTKEY + departmentId 作为key
     public Department getDepartment(String id) {
-        return departmentDao.getDepartment(id);
+        //把redis里面的字符串转化为实体遍历查找这个department
+        ObjectMapper mapper = new ObjectMapper();
+        List<Department> departmentList = null;
+        String jsonString = jedisStrings.get(DEPARTMENTKEY);
+        JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Department.class);
+        try {
+            departmentList = mapper.readValue(jsonString, javaType);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (Department department : departmentList){
+            if (department.getId().equals(id))
+                return department;
+        }
+        return null;
     }
 
     //因为部门的信息不经常变动，因此拟将department集合的数据存放到redis缓存中去
@@ -55,12 +70,18 @@ public class DepartmentServiceImpl implements DepartmentService {
         return departmentList;
     }
 
+    @Transactional
     public void deleteDepartment(String id) {
+        //因为进入delete功能之前肯定要执行查询list操作，所以key肯定存在
         departmentDao.deleteDepartment(id);
+        //新值替换旧值
+        jedisStrings.set(DEPARTMENTKEY, toJsonString(departmentDao.listDepartment()));
     }
 
+    @Transactional
     public void updateDepartment(Department department) {
         departmentDao.updateDepartment(department);
+        jedisStrings.set(DEPARTMENTKEY, toJsonString(departmentDao.listDepartment()));
     }
 
     //添加部门可以使用在部门key对应的value后面添加字符，使用jedisStrings.append(key, value);方法
