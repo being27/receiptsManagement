@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,17 +38,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         List<Department> departmentList = null;
         //两个逻辑即redis中是否有departmentList数据，有就直接查询，没有就在mysql中查询后再添加进redis中去
         ObjectMapper mapper = new ObjectMapper();
-        if (!jedisKeys.exists(key)){    //如果redis中不存在departmentList这个key
+        if (!jedisKeys.exists(key)) {    //如果redis中不存在departmentList这个key
             departmentList = departmentDao.listDepartment();
             //将list对象转化为json字符串的格式
-            String jsonString = null;
-            try {
-                jsonString = mapper.writeValueAsString(departmentList);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            jedisStrings.set(key, jsonString);
-        }else { //如果redis中存在departmentList这个key，则直接在redis中获取value
+            jedisStrings.set(key, toJsonString(departmentList));
+        } else { //如果redis中存在departmentList这个key，则直接在redis中获取value
             String jsonString = jedisStrings.get(key);
             //将字符串转化为java对象
             JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Department.class);
@@ -70,7 +63,34 @@ public class DepartmentServiceImpl implements DepartmentService {
         departmentDao.updateDepartment(department);
     }
 
+    //添加部门可以使用在部门key对应的value后面添加字符，使用jedisStrings.append(key, value);方法
     public void addDepartment(Department department) {
         departmentDao.addDepartment(department);
+        //添加之前需要判断是否有departmentList这个key，因为可能部门列表为空
+        if (!jedisKeys.exists(DEPARTMENTKEY)) {  //如果不存在这个key
+            List<Department> departmentList = departmentDao.listDepartment();
+            jedisStrings.set(DEPARTMENTKEY, toJsonString(departmentList));
+        } else {     //如果已经存在这个key了，则直接在value后面添加字符串
+            jedisStrings.set(DEPARTMENTKEY, toAppendDepartment(jedisStrings.get(DEPARTMENTKEY), department));
+        }
+    }
+
+    private String toJsonString(Object object) {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = null;
+        try {
+            jsonString = mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonString;
+    }
+
+    private String toAppendDepartment(String jsonString, Department department) {
+        StringBuilder stringBuilder = new StringBuilder(jsonString.substring(0, jsonString.length() - 1));
+        stringBuilder.append(",");
+        stringBuilder.append(toJsonString(department));
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 }
