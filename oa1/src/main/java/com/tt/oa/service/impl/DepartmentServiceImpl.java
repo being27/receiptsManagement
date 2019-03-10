@@ -64,6 +64,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     //添加部门可以使用在部门key对应的value后面添加字符，使用jedisStrings.append(key, value);方法
+    @Transactional
     public void addDepartment(Department department) {
         departmentDao.addDepartment(department);
         //添加之前需要判断是否有departmentList这个key，因为可能部门列表为空
