@@ -24,7 +24,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     private JedisUtil.Keys jedisKeys;
     @Autowired
     private JedisUtil.Strings jedisStrings;
-    private JsonStringDeal jsonStringDeal;
     //定义部门信息的key
     private static String DEPARTMENTKEY = "departmentList";
 
@@ -57,7 +56,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         if (!jedisKeys.exists(key)) {    //如果redis中不存在departmentList这个key
             departmentList = departmentDao.listDepartment();
             //将list对象转化为json字符串的格式
-            jedisStrings.set(key, jsonStringDeal.toJsonString(departmentList));
+            jedisStrings.set(key, JsonStringDeal.toJsonString(departmentList));
         } else { //如果redis中存在departmentList这个key，则直接在redis中获取value
             String jsonString = jedisStrings.get(key);
             //将字符串转化为java对象
@@ -76,13 +75,13 @@ public class DepartmentServiceImpl implements DepartmentService {
         //因为进入delete功能之前肯定要执行查询list操作，所以key肯定存在
         departmentDao.deleteDepartment(id);
         //新值替换旧值
-        jedisStrings.set(DEPARTMENTKEY, jsonStringDeal.toJsonString(departmentDao.listDepartment()));
+        jedisStrings.set(DEPARTMENTKEY, JsonStringDeal.toJsonString(departmentDao.listDepartment()));
     }
 
     @Transactional
     public void updateDepartment(Department department) {
         departmentDao.updateDepartment(department);
-        jedisStrings.set(DEPARTMENTKEY, jsonStringDeal.toJsonString(departmentDao.listDepartment()));
+        jedisStrings.set(DEPARTMENTKEY, JsonStringDeal.toJsonString(departmentDao.listDepartment()));
     }
 
     //添加部门可以使用在部门key对应的value后面添加字符，使用jedisStrings.append(key, value);方法
@@ -92,9 +91,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         //添加之前需要判断是否有departmentList这个key，因为可能部门列表为空
         if (!jedisKeys.exists(DEPARTMENTKEY)) {  //如果不存在这个key
             List<Department> departmentList = departmentDao.listDepartment();
-            jedisStrings.set(DEPARTMENTKEY, jsonStringDeal.toJsonString(departmentList));
+            jedisStrings.set(DEPARTMENTKEY, JsonStringDeal.toJsonString(departmentList));
         } else {     //如果已经存在这个key了，则直接在value后面添加字符串
-            jedisStrings.set(DEPARTMENTKEY, jsonStringDeal.toAppendDepartment(jedisStrings.get(DEPARTMENTKEY), department));
+            jedisStrings.set(DEPARTMENTKEY, JsonStringDeal.toAppendDepartment(jedisStrings.get(DEPARTMENTKEY), department));
         }
     }
 }
