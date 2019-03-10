@@ -96,11 +96,8 @@ public class JedisUtil {
 
         /**
          * 更改key
-         *
-         * @param String
-         *            oldkey
-         * @param String
-         *            newkey
+         * @param oldkey
+         * @param newkey
          * @return 状态码
          */
         public String rename(String oldkey, String newkey) {
@@ -109,11 +106,8 @@ public class JedisUtil {
 
         /**
          * 更改key,仅当新key不存在时才执行
-         *
-         * @param String
-         *            oldkey
-         * @param String
-         *            newkey
+         * @param oldkey
+         * @param newkey
          * @return 状态码
          */
         public long renamenx(String oldkey, String newkey) {
@@ -125,11 +119,8 @@ public class JedisUtil {
 
         /**
          * 更改key
-         *
-         * @param String
-         *            oldkey
-         * @param String
-         *            newkey
+         * @param oldkey
+         * @param newkey
          * @return 状态码
          */
         public String rename(byte[] oldkey, byte[] newkey) {
@@ -141,11 +132,8 @@ public class JedisUtil {
 
         /**
          * 设置key的过期时间，以秒为单位
-         *
-         * @param String
-         *            key
-         * @param 时间
-         *            ,已秒为单位
+         * @param key
+         * @param seconds
          * @return 影响的记录数
          */
         public long expired(String key, int seconds) {
@@ -157,11 +145,8 @@ public class JedisUtil {
 
         /**
          * 设置key的过期时间,它是距历元（即格林威治标准时间 1970 年 1 月 1 日的 00:00:00，格里高利历）的偏移量。
-         *
-         * @param String
-         *            key
-         * @param 时间
-         *            ,已秒为单位
+         * @param key
+         * @param timestamp
          * @return 影响的记录数
          */
         public long expireAt(String key, long timestamp) {
@@ -173,9 +158,7 @@ public class JedisUtil {
 
         /**
          * 查询key的过期时间
-         *
-         * @param String
-         *            key
+         * @param key
          * @return 以秒为单位的时间表示
          */
         public long ttl(String key) {
@@ -188,7 +171,6 @@ public class JedisUtil {
 
         /**
          * 取消对key过期时间的设置
-         *
          * @param key
          * @return 影响的记录数
          */
@@ -201,9 +183,7 @@ public class JedisUtil {
 
         /**
          * 删除keys对应的记录,可以是多个key
-         *
-         * @param String
-         *            ... keys
+         * @param keys
          * @return 删除的记录数
          */
         public long del(String... keys) {
@@ -215,9 +195,7 @@ public class JedisUtil {
 
         /**
          * 删除keys对应的记录,可以是多个key
-         *
-         * @param String
-         *            ... keys
+         * @param keys
          * @return 删除的记录数
          */
         public long del(byte[]... keys) {
@@ -229,9 +207,7 @@ public class JedisUtil {
 
         /**
          * 判断key是否存在
-         *
-         * @param String
-         *            key
+         * @param key
          * @return boolean
          */
         public boolean exists(String key) {
@@ -244,9 +220,7 @@ public class JedisUtil {
 
         /**
          * 对List,Set,SortSet进行排序,如果集合数据较大应避免使用这个方法
-         *
-         * @param String
-         *            key
+         * @param key
          * @return List<String> 集合的全部记录
          **/
         public List<String> sort(String key) {
@@ -259,11 +233,9 @@ public class JedisUtil {
 
         /**
          * 对List,Set,SortSet进行排序或limit
-         *
-         * @param String
-         *            key
-         * @param SortingParams
-         *            parame 定义排序类型或limit的起止位置.
+         * @param key
+         * @param parame
+         * parame 定义排序类型或limit的起止位置.
          * @return List<String> 全部或部分记录
          **/
         public List<String> sort(String key, SortingParams parame) {
@@ -276,9 +248,7 @@ public class JedisUtil {
 
         /**
          * 返回指定key存储的类型
-         *
-         * @param String
-         *            key
+         * @param key
          * @return String string|list|set|zset|hash
          **/
         public String type(String key) {
@@ -291,9 +261,8 @@ public class JedisUtil {
 
         /**
          * 查找所有匹配给定的模式的键
-         *
-         * @param String
-         *            key的表达式,*表示多个，？表示一个
+         * @param pattern
+         * key的表达式,*表示多个，？表示一个
          */
         public Set<String> keys(String pattern) {
             Jedis jedis = getJedis();
@@ -307,9 +276,7 @@ public class JedisUtil {
     public class Strings {
         /**
          * 根据key获取记录
-         *
-         * @param String
-         *            key
+         * @param key
          * @return 值
          */
         public String get(String key) {
@@ -322,9 +289,7 @@ public class JedisUtil {
 
         /**
          * 根据key获取记录
-         *
-         * @param byte[]
-         *            key
+         * @param key
          * @return 值
          */
         public byte[] get(byte[] key) {
@@ -337,11 +302,8 @@ public class JedisUtil {
 
         /**
          * 添加记录,如果记录已存在将覆盖原有的value
-         *
-         * @param String
-         *            key
-         * @param String
-         *            value
+         * @param key
+         * @param value
          * @return 状态码
          */
         public String set(String key, String value) {
@@ -350,11 +312,8 @@ public class JedisUtil {
 
         /**
          * 添加记录,如果记录已存在将覆盖原有的value
-         *
-         * @param String
-         *            key
-         * @param String
-         *            value
+         * @param key
+         * @param value
          * @return 状态码
          */
         public String set(String key, byte[] value) {
@@ -363,11 +322,8 @@ public class JedisUtil {
 
         /**
          * 添加记录,如果记录已存在将覆盖原有的value
-         *
-         * @param byte[]
-         *            key
-         * @param byte[]
-         *            value
+         * @param key
+         * @param value
          * @return 状态码
          */
         public String set(byte[] key, byte[] value) {
@@ -379,13 +335,9 @@ public class JedisUtil {
 
         /**
          * 添加有过期时间的记录
-         *
-         * @param String
-         *            key
-         * @param int
-         *            seconds 过期时间，以秒为单位
-         * @param String
-         *            value
+         * @param key
+         * @param seconds
+         * @param value
          * @return String 操作状态
          */
         public String setEx(String key, int seconds, String value) {
@@ -397,13 +349,10 @@ public class JedisUtil {
 
         /**
          * 添加有过期时间的记录
-         *
-         * @param String
-         *            key
-         * @param int
-         *            seconds 过期时间，以秒为单位
-         * @param String
-         *            value
+         * @param key
+         * @param seconds
+         * seconds 过期时间，以秒为单位
+         * @param value
          * @return String 操作状态
          */
         public String setEx(byte[] key, int seconds, byte[] value) {
@@ -415,11 +364,8 @@ public class JedisUtil {
 
         /**
          * 添加一条记录，仅当给定的key不存在时才插入
-         *
-         * @param String
-         *            key
-         * @param String
-         *            value
+         * @param key
+         * @param value
          * @return long 状态码，1插入成功且key不存在，0未插入，key存在
          */
         public long setnx(String key, String value) {
@@ -433,13 +379,9 @@ public class JedisUtil {
          * 从指定位置开始插入数据，插入的数据会覆盖指定位置以后的数据<br/>
          * 例:String str1="123456789";<br/>
          * 对str1操作后setRange(key,4,0000)，str1="123400009";
-         *
-         * @param String
-         *            key
-         * @param long
-         *            offset
-         * @param String
-         *            value
+         * @param key
+         * @param offset
+         * @param value
          * @return long value的长度
          */
         public long setRange(String key, long offset, String value) {
@@ -451,11 +393,8 @@ public class JedisUtil {
 
         /**
          * 在指定的key中追加value
-         *
-         * @param String
-         *            key
-         * @param String
-         *            value
+         * @param key
+         * @param value
          * @return long 追加后value的长度
          **/
         public long append(String key, String value) {
@@ -467,11 +406,9 @@ public class JedisUtil {
 
         /**
          * 将key对应的value减去指定的值，只有value可以转为数字时该方法才可用
-         *
-         * @param String
-         *            key
-         * @param long
-         *            number 要减去的值
+         * @param key
+         * @param number
+         * number 要减去的值
          * @return long 减指定值后的值
          */
         public long decrBy(String key, long number) {
@@ -482,13 +419,11 @@ public class JedisUtil {
         }
 
         /**
-         * <b>可以作为获取唯一id的方法</b><br/>
+         * 可以作为获取唯一id的方法
          * 将key对应的value加上指定的值，只有value可以转为数字时该方法才可用
-         *
-         * @param String
-         *            key
-         * @param long
-         *            number 要减去的值
+         * @param key
+         * @param number
+         * number 要减去的值
          * @return long 相加后的值
          */
         public long incrBy(String key, long number) {
@@ -500,12 +435,10 @@ public class JedisUtil {
 
         /**
          * 对指定key对应的value进行截取
-         *
-         * @param String
-         *            key
-         * @param long
+         * @param key
+         * @param startOffset
          *            startOffset 开始位置(包含)
-         * @param long
+         * @param endOffset
          *            endOffset 结束位置(包含)
          * @return String 截取的值
          */
