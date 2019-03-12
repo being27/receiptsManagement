@@ -49,9 +49,9 @@
                             <th>操作</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbody">
                         <c:forEach items="${departments}" var="department">
-                        <tr class="message-unread">
+                        <tr class="message-unread" id="td->tr">
                             <td class="hidden-xs">
                                 <label class="option block mn">
                                     <input type="checkbox" name="mobileos" value="FR">
@@ -63,7 +63,7 @@
                             <td>${department.departmentPosition}</td>
                             <td>
                                 <a href="/department/to_update?id=${department.id}">编辑</a>
-                                <a href="/department/remove?id=${department.id}">删除</a>
+                                <input type="button" onclick="getId(this)" value="删除" class="button">
                             </td>
                         </tr>
                         </c:forEach>
@@ -74,5 +74,94 @@
         </div>
     </div>
 </section>
+<style>
+    /* demo page styles */
+    body {
+        min-height: 2300px;
+    }
 
-<jsp:include page="bottom.jsp"/>
+    .content-header b,
+    .admin-form .panel.heading-border:before,
+    .admin-form .panel .heading-border:before {
+        transition: all 0.7s ease;
+    }
+
+    /* responsive demo styles */
+    @media (max-width: 800px) {
+        .admin-form .panel-body {
+            padding: 18px 12px;
+        }
+    }
+</style>
+
+<style>
+    .ui-datepicker select.ui-datepicker-month,
+    .ui-datepicker select.ui-datepicker-year {
+        width: 48%;
+        margin-top: 0;
+        margin-bottom: 0;
+
+        line-height: 25px;
+        text-indent: 3px;
+
+        color: #888;
+        border-color: #DDD;
+        background-color: #FDFDFD;
+
+        -webkit-appearance: none; /*Optionally disable dropdown arrow*/
+    }
+</style>
+<script src="../../vendor/jquery/jquery-1.4.2.js"></script>
+<script src="../../vendor/jquery/jquery_ui/jquery-1.7.1.min.js"></script>
+<script src="../../assets/admin-tools/admin-forms/js/jquery.validate.min.js"></script>
+<script src="../../assets/admin-tools/admin-forms/js/additional-methods.min.js"></script>
+<script src="../../assets/admin-tools/admin-forms/js/jquery-ui-datepicker.min.js"></script>
+<script src="../../assets/js/utility/utility.js"></script>
+<script src="../../assets/js/demo/demo.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script type="text/javascript" src="../../js/pages.js"></script>
+<script>
+    var id;
+    function getId(obj) {
+        //获取当前的tr标签下的td标签数组
+        var td = $(obj).parents("tr").children("td");
+        id = td.eq(1).text();
+    }
+
+    $(".button").live("click", function () {
+        $.ajax({
+            url:"/department/remove",
+            data:{"id":id},
+            dataType:"json",
+            type:"post",
+            cache:false,
+            sync:false,
+            success:function (result) {
+                console.log(id);
+                var content = "";
+                for (var i in result){
+                    content += "<tr class=\"message-unread\" id=\"td->tr\"><td class=\"hidden-xs\">\n" +
+                        "                                <label class=\"option block mn\">\n" +
+                        "                                    <input type=\"checkbox\" name=\"mobileos\" value=\"FR\">\n" +
+                        "                                    <span class=\"checkbox mn\"></span>\n" +
+                        "                                </label>\n" +
+                        "                            </td>\n" +
+                        "                            <td>" + result[i].id + "</td>\n" +
+                        "                            <td>" + result[i].departmentName + "</td>\n" +
+                        "                            <td>" + result[i].departmentPosition + "</td>\n" +
+                        "                            <td>\n" +
+                        "                                <a href=\"/department/to_update?id=" + result[i].id + "\">编辑</a>\n" +
+                        "                                <input type=\"button\" onclick=\"getId(this)\" value=\"删除\" class=\"button\">\n" +
+                        "                            </td>\n" +
+                        "                        </tr>";
+                    $("#td->tr").remove();
+                }
+                console.log(content);
+                $("#tbody").html(content);
+            }
+        })
+    });
+</script>
+</body>
+</html>
+

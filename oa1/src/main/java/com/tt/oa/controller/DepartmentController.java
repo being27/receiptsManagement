@@ -2,10 +2,13 @@ package com.tt.oa.controller;
 
 import com.tt.oa.entity.Department;
 import com.tt.oa.service.DepartmentService;
+
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -39,9 +42,11 @@ public class DepartmentController {
     }
 
     @RequestMapping("/remove")
-    public String removeDepartment(@Param("id")String id){
+    @ResponseBody
+    public List<Department> removeDepartment(@Param("id")String id){
+        System.out.println(id);
         departmentService.deleteDepartment(id);
-        return "redirect:list";
+        return departmentService.listDepartment();
     }
 
     @RequestMapping("/update")
