@@ -1,4 +1,5 @@
 ﻿<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -24,7 +25,8 @@
                                     <i class="fa fa-trash"></i>
                                 </button>
                                 <button type="button" class="btn btn-default light">
-                                    <i class="fa fa-plus" onclick="javascript:window.location.href='/employee/to_add';"></i>
+                                    <i class="fa fa-plus"
+                                       onclick="javascript:window.location.href='/employee/to_add';"></i>
                                 </button>
                             </div>
                         </div>
@@ -52,9 +54,9 @@
                             <th>操作</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="staffBody">
                         <c:forEach items="${staffList}" var="staff">
-                            <tr class="message-unread">
+                            <tr class="message-unread" id="content->tr">
                                 <td class="hidden-xs">
                                     <label class="option block mn">
                                         <input type="checkbox" name="mobileos" value="FR">
@@ -69,7 +71,7 @@
                                 </td>
                                 <td>
                                     <a href="/staff/toupdate?id=${staff.id}">编辑</a>
-                                    <a href="/staff/delete?id=${staff.id}">删除</a>
+                                    <input type="button" value="删除" class="button" onclick=getId(this)>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -80,5 +82,98 @@
         </div>
     </div>
 </section>
+<style>
+    /* demo page styles */
+    body {
+        min-height: 2300px;
+    }
 
-<jsp:include page="bottom.jsp"/>
+    .content-header b,
+    .admin-form .panel.heading-border:before,
+    .admin-form .panel .heading-border:before {
+        transition: all 0.7s ease;
+    }
+
+    /* responsive demo styles */
+    @media (max-width: 800px) {
+        .admin-form .panel-body {
+            padding: 18px 12px;
+        }
+    }
+</style>
+
+<style>
+    .ui-datepicker select.ui-datepicker-month,
+    .ui-datepicker select.ui-datepicker-year {
+        width: 48%;
+        margin-top: 0;
+        margin-bottom: 0;
+
+        line-height: 25px;
+        text-indent: 3px;
+
+        color: #888;
+        border-color: #DDD;
+        background-color: #FDFDFD;
+
+        -webkit-appearance: none; /*Optionally disable dropdown arrow*/
+    }
+</style>
+<script src="../../vendor/jquery/jquery-1.4.2.js"></script>
+<script src="../../vendor/jquery/jquery_ui/jquery-1.7.1.min.js"></script>
+<script src="../../assets/admin-tools/admin-forms/js/jquery.validate.min.js"></script>
+<script src="../../assets/admin-tools/admin-forms/js/additional-methods.min.js"></script>
+<script src="../../assets/admin-tools/admin-forms/js/jquery-ui-datepicker.min.js"></script>
+<script src="../../assets/js/utility/utility.js"></script>
+<script src="../../assets/js/demo/demo.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script type="text/javascript" src="../../js/pages.js"></script>
+<script>
+    var id;
+    function getId(obj) {
+        var td = $(obj).parents("tr").children("td");
+        id = td.eq(1).text();
+    }
+    $(".button").live("click", function () {
+        console.log(id);
+        $.ajax({
+            "url": "/staff/delete",
+            "type": "post",
+            "data": {"id": id},
+            "dataType": "json",
+            cache: false,
+            sync: false,
+            "success": function (result) {
+                console.log(result);
+                var content = "";
+                for (var i in result) {
+                    content += "<tr class=\"message-unread\" id=\"content->tr\">\n" +
+                        "                                <td class=\"hidden-xs\">\n" +
+                        "                                    <label class=\"option block mn\">\n" +
+                        "                                        <input type=\"checkbox\" name=\"mobileos\" value=\"FR\">\n" +
+                        "                                        <span class=\"checkbox mn\"></span>\n" +
+                        "                                    </label>\n" +
+                        "                                </td>\n" +
+                        "                                <td>" + result[i].id + "</td>\n" +
+                        "                                <td>" + result[i].name +"</td>\n" +
+                        "                                <td class=\"text-center fw600\">" +result[i].department.departmentName + "</td>\n" +
+                        "                                <td class=\"hidden-xs\">\n" +
+                        "                                    <span class=\"badge badge-warning mr10 fs11\">" + result[i].duty +"</span>\n" +
+                        "                                </td>\n" +
+                        "                                <td>\n" +
+                        "                                    <a href=\"/staff/toupdate?id=" + result[i].id + "\">编辑</a>\n" +
+                        "                                    <input type=\"button\" value=\"删除\" class=\"button\" onclick=getId(this)>\n" +
+                        "                                </td>\n" +
+                        "                            </tr>";
+                    $("#content->tr").remove();
+                }
+                console.log(content);
+                $("#staffBody").html(content);
+            }
+        });
+    });
+</script>
+</body>
+</html>
+
+
