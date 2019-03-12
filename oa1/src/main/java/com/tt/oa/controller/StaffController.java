@@ -6,10 +6,13 @@ import com.tt.oa.service.DepartmentService;
 import com.tt.oa.service.StaffService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -70,9 +73,11 @@ public class StaffController {
     }
 
     @RequestMapping("/delete")
-    public String deleteStaff(String id){
+    @ResponseBody
+    public List<Staff> deleteStaff(@Param("id")String id){
+        System.out.println(id);
         staffService.deleteStaff(id);
-        return "redirect:list";
+        return staffService.listStaff();
     }
 
     @RequestMapping("/toupdate")
