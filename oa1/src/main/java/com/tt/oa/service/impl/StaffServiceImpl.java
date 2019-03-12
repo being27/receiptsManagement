@@ -9,12 +9,12 @@ import com.tt.oa.service.StaffService;
 import com.tt.oa.dao.StaffDao;
 import com.tt.oa.entity.Staff;
 import com.tt.oa.utils.JsonStringDeal;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -60,6 +60,9 @@ public class StaffServiceImpl implements StaffService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        if (staffList != null){
+            Collections.sort(staffList);
         }
         return staffList;
     }
